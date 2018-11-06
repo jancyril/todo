@@ -11,13 +11,11 @@
 				<form id="new-task">
 					<div class="form-group">
 						<label for="title">Title</label>
-                        <input type="text" class="form-control" name="title" id="title" placeholder="Enter title">
-                        <small class="title-error text-danger"></small>
+                        <input type="text" class="form-control" name="title" placeholder="Enter title">
 					</div>
 					<div class="form-group">
 						<label for="description">Description</label>
-                        <textarea name="description" class="form-control" id="description" cols="30" rows="10" placeholder="Add some description"></textarea>
-                        <small class="description-error text-danger"></small>
+                        <textarea name="description" class="form-control" cols="30" rows="10" placeholder="Add some description"></textarea>
            </div>
 				</form>
 			</div>

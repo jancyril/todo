@@ -48,7 +48,7 @@ class TasksController extends Controller
                 return new SuccessResponse('New task has been successfully created.');
             }
 
-            return new ErrorResponse('Failed to create task, please try again.');
+            return new ErrorResponse('Failed to create task, please try again.', [], 409);
         } catch (\Throwable $e) {
             return new ErrorResponse('Something went wrong while trying to create new task.');
         }
@@ -74,6 +74,17 @@ class TasksController extends Controller
      */
     public function edit(Task $task)
     {
+        try {
+            return new SuccessResponse(
+                'Successfully fetched task details',
+                [
+                    'taskTitle' => $task->title,
+                    'taskDescription' => $task->description
+                ]
+            );
+        } catch (\Throwable $e) {
+            return new ErrorResponse('Failed to fetch update task, please try again.', [], 404);
+        }
     }
 
     /**
@@ -84,10 +95,10 @@ class TasksController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function update(Validation $validation, Request $request, Task $task)
+    public function update(Request $request, Validation $validation, Task $task)
     {
         try {
-            if (Task::update($request->all())) {
+            if ($task->update($request->all())) {
                 return new SuccessResponse('Task has been successfully updated.');
             }
 
@@ -107,7 +118,7 @@ class TasksController extends Controller
     public function destroy(Task $task)
     {
         try {
-            if (Task::destroy($task->id)) {
+            if ($task->destroy($task->id)) {
                 return new SuccessResponse('Task has been successfully deleted.');
             }
 

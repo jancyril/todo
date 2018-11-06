@@ -53,7 +53,6 @@ function validationErrors(error) {
 }
 
 $('#save-new-task').on('click', function (e) {
-
     $.ajax({
         type: 'POST',
         url: '/tasks',
@@ -64,6 +63,27 @@ $('#save-new-task').on('click', function (e) {
         validationErrors(errors.errors);
     }).done(function (response) {
         notify(response);
+    });
+
+    e.preventDefault();
+});
+
+$('#save-changes').on('click', function (e) {
+    $.ajax({
+        type: 'PUT',
+        url: '/tasks/' + $('#task-id').val(),
+        data: $('#update-task').serialize(),
+        dataType: 'json'
+    }).fail(function (data) {
+        var errors = data.responseJSON;
+        validationErrors(errors.errors);
+    }).done(function (response) {
+        notify(response);
+
+        if (response.success) {
+            $('#update-task-modal').modal('hide');
+            table.ajax.reload();
+        }
     });
 
     e.preventDefault();
@@ -90,7 +110,7 @@ var table = $('#all-tasks').DataTable({
             for (var x = 0; x < json.data.length; x++) {
                 var buttons = '';
 
-                buttons += '<a href="/users/' + json.data[x].id + '/edit" class="btn btn-xs btn-primary edit" target="_blank" title="Edit"><i class="fa fa-pencil fa-fw"></i></a>';
+                buttons += '<button data-id="' + json.data[x].id + '" class="btn btn-xs btn-primary edit" title="Edit" data-toggle="modal" data-target="#update-task-modal"><i class="fa fa-pencil fa-fw"></i></button>';
 
                 buttons += ' ';
 
@@ -110,9 +130,25 @@ var table = $('#all-tasks').DataTable({
     }
 });
 
+$('#all-tasks').on('click', '.edit', function () {
+    var id = $(this).data('id');
+    $('#title').val('');
+    $('#description').val('');
+    $('#task-id').val(id);
+
+    $.get({
+        url: '/tasks/' + id + '/edit',
+        dataType: 'json'
+    }).fail(function (data) {
+        notify(data.responseJSON);
+    }).done(function (response) {
+        $('#title').val(response.taskTitle);
+        $('#description').val(response.taskDescription);
+    });
+});
+
 $('#all-tasks').on('click', '.delete', function () {
     var id = $(this).data('id');
-    console.log(id);
 
     swal({
         title: 'Delete this task?',
@@ -145,4 +181,3 @@ $('#all-tasks').on('click', '.delete', function () {
         }
     });
 });
-

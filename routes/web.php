@@ -11,7 +11,7 @@
 |
 */
 
-Route::resource('tasks', 'TasksController')->only(['store', 'update', 'destroy']);
+Route::resource('tasks', 'TasksController')->only(['edit', 'store', 'update', 'destroy']);
 Route::get('tasks/get', 'TasksController@get');
 
 Route::get('/', function () {
