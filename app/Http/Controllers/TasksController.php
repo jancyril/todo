@@ -19,6 +19,11 @@ class TasksController extends Controller
     {
     }
 
+    public function get(Request $request, Task $task)
+    {
+        return $task->dataTables($request->all());
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -102,13 +107,13 @@ class TasksController extends Controller
     public function destroy(Task $task)
     {
         try {
-            if (Task::destroy($request->all())) {
+            if (Task::destroy($task->id)) {
                 return new SuccessResponse('Task has been successfully deleted.');
             }
 
             return new ErrorResponse('Failed to delete task, please try again.');
         } catch (\Throwable $e) {
-            return new ErrorResponse('Something went wrong while trying to delete task.');
+            return new ErrorResponse($e->getMessage());
         }
     }
 }

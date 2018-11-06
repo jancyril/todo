@@ -11,7 +11,8 @@
 |
 */
 
-Route::resource('tasks', 'TasksController');
+Route::resource('tasks', 'TasksController')->only(['store', 'update', 'destroy']);
+Route::get('tasks/get', 'TasksController@get');
 
 Route::get('/', function () {
     return view('master');
