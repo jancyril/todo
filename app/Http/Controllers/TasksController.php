@@ -10,28 +10,24 @@ use App\Http\Requests\Task as Validation;
 
 class TasksController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-    }
-
     public function get(Request $request, Task $task)
     {
         return $task->dataTables($request->all());
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function show(Task $task)
     {
-        return view('create');
+        try {
+            return new SuccessResponse(
+                'Successfully fetched task details',
+                [
+                    'title' => $task->title,
+                    'description' => $task->description
+                ]
+            );
+        } catch (\Throwable $e) {
+            return new ErrorResponse('Failed to fetch update task, please try again.', [], 404);
+        }
     }
 
     /**
@@ -55,17 +51,6 @@ class TasksController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param \App\Models\Task $task
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Task $task)
-    {
-    }
-
-    /**
      * Show the form for editing the specified resource.
      *
      * @param \App\Models\Task $task
@@ -78,8 +63,8 @@ class TasksController extends Controller
             return new SuccessResponse(
                 'Successfully fetched task details',
                 [
-                    'taskTitle' => $task->title,
-                    'taskDescription' => $task->description
+                    'title' => $task->title,
+                    'description' => $task->description
                 ]
             );
         } catch (\Throwable $e) {
@@ -118,13 +103,26 @@ class TasksController extends Controller
     public function destroy(Task $task)
     {
         try {
-            if ($task->destroy($task->id)) {
+            if ($task->delete()) {
                 return new SuccessResponse('Task has been successfully deleted.');
             }
 
             return new ErrorResponse('Failed to delete task, please try again.');
         } catch (\Throwable $e) {
             return new ErrorResponse($e->getMessage());
+        }
+    }
+
+    public function updateStatus(Request $request, Task $task)
+    {
+        try {
+            if ($task->update(['status' => $request->get('status')])) {
+                return new SuccessResponse('Status has been successfully updated.');
+            }
+
+            return new ErrorResponse('Failed to update status, please try again.', [], 409);
+        } catch (\Throwable $e) {
+            return new ErrorResponse('Something went wrong while trying to update status.');
         }
     }
 }

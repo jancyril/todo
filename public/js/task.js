@@ -63,9 +63,18 @@ $('#save-new-task').on('click', function (e) {
         validationErrors(errors.errors);
     }).done(function (response) {
         notify(response);
+
+        if (response.success) {
+            $('#new-task-modal').modal('hide');
+            table.ajax.reload();
+        }
     });
 
     e.preventDefault();
+});
+
+$('#new-task-modal').on('show.bs.modal', function () {
+    $('#new-task')[0].reset();
 });
 
 $('#save-changes').on('click', function (e) {
@@ -110,6 +119,14 @@ var table = $('#all-tasks').DataTable({
             for (var x = 0; x < json.data.length; x++) {
                 var buttons = '';
 
+                if (json.data[x].status === 'open') {
+                    buttons += '<button data-id="' + json.data[x].id + '" class="btn btn-xs btn-success complete" title="Mark as Complete"><i class="fa fa-check fa-fw"></i></button>';
+                } else {
+                    buttons += '<button data-id="' + json.data[x].id + '" class="btn btn-xs btn-info reopen" title="Reopen"><i class="fa fa-tasks fa-fw"></i></button>';
+                }
+
+                buttons += ' ';
+
                 buttons += '<button data-id="' + json.data[x].id + '" class="btn btn-xs btn-primary edit" title="Edit" data-toggle="modal" data-target="#update-task-modal"><i class="fa fa-pencil fa-fw"></i></button>';
 
                 buttons += ' ';
@@ -117,7 +134,7 @@ var table = $('#all-tasks').DataTable({
                 buttons += '<button data-id="' + json.data[x].id + '" class="btn btn-xs btn-danger delete" title="Delete"><i class="fa fa-trash fa-fw"></i></button>';
 
                 columns.push([
-                    json.data[x].title,
+                    '<a href="#" data-id="' + json.data[x].id + '" class="view">' + json.data[x].title + '</a>',
                     json.data[x].status,
                     buttons
                 ]);
@@ -128,6 +145,23 @@ var table = $('#all-tasks').DataTable({
             return JSON.stringify(json);
         }
     }
+});
+
+$('#all-tasks').on('click', '.view', function (e) {
+    var id = $(this).data('id');
+
+    $.get({
+        url: '/tasks/' + id,
+        dataType: 'json'
+    }).fail(function (data) {
+        notify(data.responseJSON);
+    }).done(function (response) {
+        $('#view-task-modal').modal('show');
+        $('#view-task-modal').find('h5').text(response.data.title);
+        $('#view-task-modal').find('.modal-body').text(response.data.description);
+    });
+
+    e.preventDefault();
 });
 
 $('#all-tasks').on('click', '.edit', function () {
@@ -142,8 +176,80 @@ $('#all-tasks').on('click', '.edit', function () {
     }).fail(function (data) {
         notify(data.responseJSON);
     }).done(function (response) {
-        $('#title').val(response.taskTitle);
-        $('#description').val(response.taskDescription);
+        $('#title').val(response.data.title);
+        $('#description').val(response.data.description);
+    });
+});
+
+$('#all-tasks').on('click', '.complete', function () {
+    var id = $(this).data('id');
+
+    swal({
+        title: 'Mark this task as complete?',
+        icon: 'info',
+        buttons: {
+            cancel: "Cancel",
+            confirm: {
+                text: "Yes",
+                closeModal: false
+            }
+        },
+        closeOnClickOutside: false,
+    })
+    .then((completed) => {
+        if (completed) {
+            $.ajax({
+                type: 'PATCH',
+                url: '/tasks/status/' + id,
+                data: { status: 'complete' },
+                dataType: 'json'
+            }).fail(function (data) {
+                notify(data.responseJSON);
+            }).done(function (response) {
+                swal.close();
+                notify(response);
+
+                if (response.success) {
+                    table.ajax.reload();
+                }
+            });
+        }
+    });
+});
+
+$('#all-tasks').on('click', '.reopen', function () {
+    var id = $(this).data('id');
+
+    swal({
+        title: 'Reopen this task?',
+        icon: 'info',
+        buttons: {
+            cancel: "Cancel",
+            confirm: {
+                text: "Yes",
+                closeModal: false
+            }
+        },
+        closeOnClickOutside: false,
+    })
+    .then((open) => {
+        if (open) {
+            $.ajax({
+                type: 'PATCH',
+                url: '/tasks/status/' + id,
+                data: { status: 'open' },
+                dataType: 'json'
+            }).fail(function (data) {
+                notify(data.responseJSON);
+            }).done(function (response) {
+                swal.close();
+                notify(response);
+
+                if (response.success) {
+                    table.ajax.reload();
+                }
+            });
+        }
     });
 });
 
@@ -170,6 +276,8 @@ $('#all-tasks').on('click', '.delete', function () {
                 type: 'DELETE',
                 url: '/tasks/' + id,
                 dataType: 'json'
+            }).fail(function (data) {
+                notify(data.responseJSON);
             }).done(function (response) {
                 swal.close();
                 notify(response);

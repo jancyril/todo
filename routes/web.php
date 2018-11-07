@@ -11,8 +11,10 @@
 |
 */
 
-Route::resource('tasks', 'TasksController')->only(['edit', 'store', 'update', 'destroy']);
+
 Route::get('tasks/get', 'TasksController@get');
+Route::patch('tasks/status/{task}', 'TasksController@updateStatus');
+Route::resource('tasks', 'TasksController')->only(['show', 'edit', 'store', 'update', 'destroy']);
 
 Route::get('/', function () {
     return view('master');
