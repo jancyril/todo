@@ -17,7 +17,7 @@ class Tasks extends Migration
             $table->increments('id');
             $table->string('title');
             $table->text('description');
-            $table->string('status');
+            $table->string('status')->default('open');
             $table->timestamps();
         });
     }
