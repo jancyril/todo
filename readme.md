@@ -3,7 +3,9 @@
 ## Installation
 - Clone this repository
 - Run `composer install`
+- Rename `.env.example` to `.env` and add your database name, user and password
 - Run `php artisan migrate`
+- Open your browser
 
 
 ## Resources
