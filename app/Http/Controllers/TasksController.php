@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
+use App\Activity\Log;
 use Illuminate\Http\Request;
 use App\Helpers\ErrorResponse;
 use App\Helpers\SuccessResponse;
@@ -10,9 +11,18 @@ use App\Http\Requests\Task as Validation;
 
 class TasksController extends Controller
 {
-    public function get(Request $request, Task $task)
+    private $log;
+    private $request;
+
+    public function __construct(Request $request, Log $log)
     {
-        return $task->dataTables($request->all());
+        $this->request = $request;
+        $this->log = $log;
+    }
+
+    public function get(Task $task)
+    {
+        return $task->dataTables($this->request->all());
     }
 
     public function show(Task $task)
@@ -37,11 +47,15 @@ class TasksController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, Validation $validation)
+    public function store(Validation $validation)
     {
         try {
-            if (Task::create($request->all())) {
-                return new SuccessResponse('New task has been successfully created.');
+            if ($newTask = Task::create($this->request->all())) {
+                $message = 'New task has been successfully created.';
+
+                $this->log->newTask($message, $newTask->toArray());
+
+                return new SuccessResponse($message);
             }
 
             return new ErrorResponse('Failed to create task, please try again.', [], 409);
@@ -80,11 +94,17 @@ class TasksController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Validation $validation, Task $task)
+    public function update(Validation $validation, Task $task)
     {
         try {
-            if ($task->update($request->all())) {
-                return new SuccessResponse('Task has been successfully updated.');
+            $oldTaskValue = $task->toArray();
+
+            if ($task->update($this->request->all())) {
+                $message = 'Task has been successfully updated.';
+
+                $this->log->updatedTask($message, $task->toArray(), $oldTaskValue);
+
+                return new SuccessResponse($message);
             }
 
             return new ErrorResponse('Failed to update task, please try again.');
@@ -103,8 +123,14 @@ class TasksController extends Controller
     public function destroy(Task $task)
     {
         try {
+            $oldTaskValue = $task->toArray();
+
             if ($task->delete()) {
-                return new SuccessResponse('Task has been successfully deleted.');
+                $message = 'Task has been successfully deleted.';
+
+                $this->log->deletedTask($message, $oldTaskValue);
+
+                return new SuccessResponse($message);
             }
 
             return new ErrorResponse('Failed to delete task, please try again.');
@@ -113,16 +139,22 @@ class TasksController extends Controller
         }
     }
 
-    public function updateStatus(Request $request, Task $task)
+    public function updateStatus(Task $task)
     {
         try {
-            if ($task->update(['status' => $request->get('status')])) {
-                return new SuccessResponse('Status has been successfully updated.');
+            $oldStatus = $task->only(['id', 'status']);
+
+            if ($task->update(['status' => $this->request->get('status')])) {
+                $message = 'Status has been successfully updated.';
+
+                $this->log->updatedStatus($message, $task->only(['id', 'status']), $oldStatus);
+
+                return new SuccessResponse($message);
             }
 
             return new ErrorResponse('Failed to update status, please try again.', [], 409);
         } catch (\Throwable $e) {
-            return new ErrorResponse('Something went wrong while trying to update status.');
+            return new ErrorResponse($e->getMessage());
         }
     }
 }

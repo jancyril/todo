@@ -60,7 +60,12 @@ $('#save-new-task').on('click', function (e) {
         dataType: 'json'
     }).fail(function (data) {
         var errors = data.responseJSON;
-        validationErrors(errors.errors);
+
+        if(errors.hasOwnProperty('errors')) {
+            validationErrors(errors.errors);
+        } else {
+            notify(errors);
+        }
     }).done(function (response) {
         notify(response);
 
