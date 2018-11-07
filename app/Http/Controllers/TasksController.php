@@ -58,7 +58,7 @@ class TasksController extends Controller
                 return new SuccessResponse($message);
             }
 
-            return new ErrorResponse('Failed to create task, please try again.', [], 409);
+            return new ErrorResponse('Failed to create new task, please try again.', [], 409);
         } catch (\Throwable $e) {
             return new ErrorResponse('Something went wrong while trying to create new task.');
         }
@@ -82,7 +82,7 @@ class TasksController extends Controller
                 ]
             );
         } catch (\Throwable $e) {
-            return new ErrorResponse('Failed to fetch update task, please try again.', [], 404);
+            return new ErrorResponse('Something went wrong while trying to fetch task details.');
         }
     }
 
