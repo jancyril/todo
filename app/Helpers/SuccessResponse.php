@@ -13,8 +13,9 @@ class SuccessResponse extends Response
             'type' => 'success',
             'title' => 'Success',
             'message' => $message,
+            'data' => $data,
         ];
 
-        parent::__construct(array_merge($content, $data), $status, $headers);
+        parent::__construct($content, $status, $headers);
     }
 }

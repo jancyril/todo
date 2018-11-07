@@ -13,8 +13,9 @@ class ErrorResponse extends Response
             'type' => 'error',
             'title' => 'Error',
             'message' => $message,
+            'data' => $data,
         ];
 
-        parent::__construct(array_merge($content, $data), $status, $headers);
+        parent::__construct($content, $status, $headers);
     }
 }
