@@ -1,5 +1,11 @@
 # Simple ToDo Application
 
+## Installation
+- Clone this repository
+- Run `composer install`
+- Run `php artisan migrate`
+
+
 ## Resources
 - PNotify - https://sciactive.com/pnotify/
 - Sweetalert - https://sweetalert.js.org/guides/
