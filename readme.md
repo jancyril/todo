@@ -19,7 +19,7 @@
 Note: Change `{idNumber}` to whatever value you get from the previous command.
 - Migrate the database, `docker exec todo_php_1 php artisan migrate`
 - Open your browser and go to `http://localhost`
-
+- To access the phpmyadmin, go to `http://localhost:8080`
 
 ## Resources
 - PNotify - https://sciactive.com/pnotify/
