@@ -14,6 +14,7 @@
 - Clone this repository
 - Rename `.env.example` to `.env`
 - Run `docker-compose up -d`
+- Run `docker exec todo_php_1 composer install`
 - Get the container user's group id by running `docker exec todo_php_1 id`, note that the word `todo` varies, change this to the folder where you save this repository, this is necessary to set proper file permission.
 - After getting the group-id, chown and chmod this repository by running `chown -R yourusername:{idNumber} .` and `chmod -R ug+rw .`
 Note: Change `{idNumber}` to whatever value you get from the previous command.
