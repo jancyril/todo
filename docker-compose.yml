@@ -19,6 +19,13 @@ services:
       - appnet
     depends_on:
       - db
+  cli:
+    image: jancyril/php-cli
+    volumes:
+      - .:/app
+    networks:
+      - appnet
+    tty: true
   db:
     image: mariadb:latest
     environment:
