@@ -10,17 +10,18 @@
 - Open your browser
 
 ### Option 2
+#### For ease of testing, you may use https://labs.play-with-docker.com/
 - Ensure you have docker and docker-compose installed
 - Clone this repository
 - Rename `.env.example` to `.env`
 - Run `docker-compose up -d`
-- Run `docker exec todo_cli_1 composer install`
 - Get the container user's group id by running `docker exec todo_cli_1 id`, note that the word `todo` varies, change this to the folder where you save this repository, this is necessary to set proper file permission.
 - After getting the group-id, chown and chmod this repository by running `chown -R yourusername:{idNumber} .` and `chmod -R ug+rw .`
 Note: Change `{idNumber}` to whatever value you get from the previous command.
+- Run `docker exec todo_cli_1 composer install`
 - Migrate the database, `docker exec todo_php_1 php artisan migrate`
 - Open your browser and go to `http://localhost`
-- To access the phpmyadmin, go to `http://localhost:8080`
+- To access the phpmyadmin, go to `http://localhost:8080
 
 ## Resources
 - PNotify - https://sciactive.com/pnotify/
